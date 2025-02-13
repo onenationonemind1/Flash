@@ -1,0 +1,13 @@
+16:07:58 **** Build of configuration Debug for project STM32F030R8-Nucleo ****
+make all 
+arm-none-eabi-gcc "C:/Users/admin/STM32CubeIDE/workspace_1.17.0/STM32CubeF0/Projects/STM32F030R8-Nucleo/Examples/UART/UART_TwoBoards_ComDMA/Src/main.c" -mcpu=cortex-m0 -std=gnu11 -g3 -DSTM32F030x8 -DUSE_HAL_DRIVER -DUSE_STM32F0XX_NUCLEO -c -I../../../Inc -I../../../../../../../../Drivers/CMSIS/Device/ST/STM32F0xx/Include -I../../../../../../../../Drivers/STM32F0xx_HAL_Driver/Inc -I../../../../../../../../Drivers/BSP/STM32F0xx-Nucleo -I../../../../../../../../Drivers/CMSIS/Include -Os -ffunction-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Example/User/main.d" -MT"Example/User/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Example/User/main.o"
+In file included from C:/Users/admin/STM32CubeIDE/workspace_1.17.0/STM32CubeF0/Projects/STM32F030R8-Nucleo/Examples/UART/UART_TwoBoards_ComDMA/Src/main.c:23:
+../../../Inc/main.h:24:10: fatal error: stm32f0xx_hal.h: No such file or directory
+   24 | #include "stm32f0xx_hal.h"
+      |          ^~~~~~~~~~~~~~~~~
+compilation terminated.
+make: *** [Example/User/subdir.mk:25: Example/User/main.o] Error 1
+"make all" terminated with exit code 2. Build might be incomplete.
+
+16:07:59 Build Failed. 2 errors, 0 warnings. (took 188ms)
+
