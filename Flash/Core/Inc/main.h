@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.h
+ * @brief          : Header for main.c file.
+ *                   This file contains the common defines of the application.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2025 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -23,7 +23,8 @@
 #define __MAIN_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -36,35 +37,53 @@ extern "C" {
 #include <string.h>
 
 #include "timer.h"
-/* USER CODE END Includes */
+#include "flash.h"
 
-/* Exported types ------------------------------------------------------------*/
-/* USER CODE BEGIN ET */
+  extern TIM_HandleTypeDef htim2;
+  extern UART_HandleTypeDef huart2;
+  extern UART_HandleTypeDef huart3;
+  extern DMA_HandleTypeDef hdma_usart2_tx;
+  extern DMA_HandleTypeDef hdma_usart2_rx;
 
-/* USER CODE END ET */
+  typedef struct
+  {
+    uint16_t tvoc;       // TVOC concentration (ppb)
+    uint16_t pm1_0;      // PM1.0 (μg/m3)
+    uint16_t pm2_5;      // PM2.5 (μg/m3)
+    uint16_t pm10;       // PM10 (μg/m3)
+    int16_t temperature; // Temperature (°C * 10)
+    uint16_t humidity;   // Humidity (% * 10)
+  } AM1002_Data_t;
 
-/* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
+  /* USER CODE END Includes */
 
-/* USER CODE END EC */
+  /* Exported types ------------------------------------------------------------*/
+  /* USER CODE BEGIN ET */
 
-/* Exported macro ------------------------------------------------------------*/
-/* USER CODE BEGIN EM */
+  /* USER CODE END ET */
 
-/* USER CODE END EM */
+  /* Exported constants --------------------------------------------------------*/
+  /* USER CODE BEGIN EC */
 
-/* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
+  /* USER CODE END EC */
 
-/* USER CODE BEGIN EFP */
+  /* Exported macro ------------------------------------------------------------*/
+  /* USER CODE BEGIN EM */
 
-/* USER CODE END EFP */
+  /* USER CODE END EM */
 
-/* Private defines -----------------------------------------------------------*/
+  /* Exported functions prototypes ---------------------------------------------*/
+  void Error_Handler(void);
 
-/* USER CODE BEGIN Private defines */
+  /* USER CODE BEGIN EFP */
 
-/* USER CODE END Private defines */
+  /* USER CODE END EFP */
+
+  /* Private defines -----------------------------------------------------------*/
+
+  /* USER CODE BEGIN Private defines */
+
+  /* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }

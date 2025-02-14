@@ -48,15 +48,7 @@ DMA_HandleTypeDef hdma_usart2_tx;
 DMA_HandleTypeDef hdma_usart2_rx;
 
 /* USER CODE BEGIN PV */
-typedef struct
-{
-  uint16_t tvoc;       // TVOC concentration (ppb)
-  uint16_t pm1_0;      // PM1.0 (μg/m3)
-  uint16_t pm2_5;      // PM2.5 (μg/m3)
-  uint16_t pm10;       // PM10 (μg/m3)
-  int16_t temperature; // Temperature (°C * 10)
-  uint16_t humidity;   // Humidity (% * 10)
-} AM1002_Data_t;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,7 +59,7 @@ static void MX_USART2_UART_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+AM1002_Data_t multiDataread(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -183,7 +175,12 @@ int main(void)
     /* USER CODE END WHILE */
     if (g_timer_ms_1000 == ENABLE)
     {
+      AM1002_Data_t read_data = multiDataread(); // 임시 변수 사용
+      PrintCalibrationData(read_data);
+      HAL_UART_Transmit(&huart3, (uint8_t *)"Data read done\r\n", 16, HAL_MAX_DELAY);
+
       g_timer_ms_1000 = DISABLE;
+
       memset(rx_buffer, 0, sizeof(rx_buffer));
 
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
@@ -197,6 +194,7 @@ int main(void)
         sprintf(debug, "Raw Data: ");
         HAL_UART_Transmit(&huart3, (uint8_t *)debug, strlen(debug), HAL_MAX_DELAY);
 
+        memset(debug, 0, sizeof(debug));
         for (int i = 0; i < 22; i++)
         {
           sprintf(debug, "%02X ", rx_buffer[i]);
@@ -206,7 +204,16 @@ int main(void)
 
         if (rx_buffer[0] == 0x16 && rx_buffer[1] == 0x13 && rx_buffer[2] == 0x16)
         {
-          ProcessAndPrintAM1002(&huart3, rx_buffer);
+          AM1002_Data_t current_data = ProcessAndPrintAM1002(&huart3, rx_buffer);
+          if (current_data.humidity > 500)
+          {
+            multiDatawrite(current_data);
+            // PrintCalibrationData(read_data1);
+          }
+          else
+          {
+            HAL_UART_Transmit(&huart3, (uint8_t *)"Humidity is low\r\n", 18, HAL_MAX_DELAY);
+          }
         }
         else
         {
