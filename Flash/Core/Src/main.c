@@ -124,6 +124,22 @@ int main(void)
     {
       g_timer_ms_1000 = DISABLE;
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+
+      HAL_UART_Transmit(&huart2, cmd, sizeof(cmd), 1000);
+      HAL_StatusTypeDef status = HAL_UART_Receive(&huart2, rx_buffer, 22, 1000);
+    
+      if (status == HAL_OK) {
+          // 데이터 수신 확인을 위한 디버그 출력
+          char debug[100];
+          sprintf(debug, "Raw Data: ");
+          HAL_UART_Transmit(&huart3, (uint8_t*)debug, strlen(debug), HAL_MAX_DELAY);
+          
+          for(int i = 0; i < 22; i++) {
+              sprintf(debug, "%02X ", rx_buffer[i]);
+              HAL_UART_Transmit(&huart3, (uint8_t*)debug, strlen(debug), HAL_MAX_DELAY);
+          }
+          HAL_UART_Transmit(&huart3, (uint8_t*)"\r\n", 2, HAL_MAX_DELAY);
+        }
     }
     /* USER CODE BEGIN 3 */
   }
