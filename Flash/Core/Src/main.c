@@ -64,6 +64,13 @@ static void MX_USART3_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+// void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+// {
+//   if(htim->Instance == TIM2)
+//   {
+//     HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+//   }
+// }
 
 /* USER CODE END 0 */
 
@@ -113,27 +120,10 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    // if(g_timer_ms_1000 == ENABLE)
+    if (g_timer_ms_1000 == ENABLE)
     {
-        g_timer_ms_1000 = DISABLE;
-        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-
-        HAL_UART_Transmit(&huart2, cmd, sizeof(cmd), HAL_MAX_DELAY);
-        HAL_StatusTypeDef status = HAL_UART_Receive(&huart2, rx_buffer, 22, 1000);
-
-        if (status == HAL_OK) {
-          // 데이터 수신 확인을 위한 디버그 출력
-          char debug[100];
-          sprintf(debug, "Raw Data: ");
-          HAL_UART_Transmit(&huart3, (uint8_t*)debug, strlen(debug), HAL_MAX_DELAY);
-          
-          for(int i = 0; i < 22; i++) {
-              sprintf(debug, "%02X ", rx_buffer[i]);
-              HAL_UART_Transmit(&huart3, (uint8_t*)debug, strlen(debug), HAL_MAX_DELAY);
-          }
-          HAL_UART_Transmit(&huart3, (uint8_t*)"\r\n", 2, HAL_MAX_DELAY);
-        }
-        HAL_Delay(1000);
+      g_timer_ms_1000 = DISABLE;
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
     }
     /* USER CODE BEGIN 3 */
   }
@@ -203,7 +193,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 7999;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 4294967295;
+  htim2.Init.Period = 999;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -222,7 +212,8 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM2_Init 2 */
-
+  HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(TIM2_IRQn);
   /* USER CODE END TIM2_Init 2 */
 
 }
