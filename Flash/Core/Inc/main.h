@@ -38,6 +38,7 @@ extern "C"
 
 #include "timer.h"
 #include "flash.h"
+#include "modbus.h"
 
   extern TIM_HandleTypeDef htim2;
   extern UART_HandleTypeDef huart2;
@@ -59,6 +60,14 @@ extern "C"
 
   /* Exported types ------------------------------------------------------------*/
   /* USER CODE BEGIN ET */
+  #if 0
+  #define terminal_mode 1
+  #endif
+
+  #if 1
+  #define terminal_modbus 1
+  #endif
+
 
   /* USER CODE END ET */
 

@@ -132,7 +132,9 @@ int main(void)
   {
     AM1002_Data_t sensorData;
     AM1002_Data_t result = ProcessAM1002Data(rx_buffer, &sensorData);
+    #ifdef terminal_mode
     PrintAM1002Data(huart, &sensorData);
+    #endif
 
     return result;
   }
@@ -166,6 +168,13 @@ int main(void)
   uint8_t rx_data;
   uint8_t cmd[] = {0x11, 0x01, 0x16, 0xD8};
   uint8_t rx_buffer[32];
+
+  int count = 0;
+  uint8_t test = 0x00;
+  uint8_t* arr_test = &test;
+  uint8_t data;
+
+  uint8_t request[] = {0x01, 0x03, 0x00, 0x00, 0x00, 0x06, 0xC5, 0xCD};
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -175,33 +184,90 @@ int main(void)
     /* USER CODE END WHILE */
     if (g_timer_ms_1000 == ENABLE)
     {
-      AM1002_Data_t read_data = multiDataread(); // 임시 변수 사용
-      PrintCalibrationData(read_data);
-      HAL_UART_Transmit(&huart3, (uint8_t *)"Data read done\r\n", 16, HAL_MAX_DELAY);
-
       g_timer_ms_1000 = DISABLE;
 
+      test++;
+      #if 1
+      // AM1002_Data_t read_data = multiDataread(); // 임시 변수 사용
       memset(rx_buffer, 0, sizeof(rx_buffer));
-
-      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+      
+      #ifdef terminal_mode
+      PrintCalibrationData(read_data);
+      HAL_UART_Transmit(&huart3, (uint8_t *)"Data read done\r\n", 16, HAL_MAX_DELAY);
+      #endif
 
       HAL_UART_Transmit(&huart2, cmd, sizeof(cmd), 1000);
-      HAL_StatusTypeDef status = HAL_UART_Receive(&huart2, rx_buffer, 22, 1000);
+      HAL_StatusTypeDef status = HAL_UART_Receive(&huart2, rx_buffer, 22, 1000); 
 
-      if (status == HAL_OK)
+      HAL_UART_Receive(&huart3, request, sizeof(request), 1000); 
+      //HAL_UART_Transmit(&huart3, request, sizeof(request), 100);
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+
+    
+
+      if (request[0] == 0x01)
       {
-        char debug[100];
-        sprintf(debug, "Raw Data: ");
-        HAL_UART_Transmit(&huart3, (uint8_t *)debug, strlen(debug), HAL_MAX_DELAY);
+        AM1002_Data_t read_data = multiDataread();
 
-        memset(debug, 0, sizeof(debug));
-        for (int i = 0; i < 22; i++)
-        {
-          sprintf(debug, "%02X ", rx_buffer[i]);
-          HAL_UART_Transmit(&huart3, (uint8_t *)debug, strlen(debug), HAL_MAX_DELAY);
-        }
-        HAL_UART_Transmit(&huart3, (uint8_t *)"\r\n", 2, HAL_MAX_DELAY);
+        uint8_t response1[] = {0x01, 0x03, 0x0C, 
+          (uint8_t)(read_data.tvoc >> 8), (uint8_t)(read_data.tvoc & 0xFF), // TVOC 
+          (uint8_t)(read_data.pm1_0 >> 8), (uint8_t)(read_data.pm1_0 & 0xFF), // PM1.0
+          (uint8_t)(read_data.pm2_5 >> 8), (uint8_t)(read_data.pm2_5 & 0xFF), // PM2.5
+          (uint8_t)(read_data.pm10 >> 8), (uint8_t)(read_data.pm10 & 0xFF), // PM10
+          (uint8_t)(read_data.humidity >> 8), (uint8_t)(read_data.humidity & 0xFF), // Temperature
+          (uint8_t)(read_data.temperature >> 8), (uint8_t)(read_data.temperature & 0xFF), // Humidity
+          0x00, 0x00};
+        uint16_t crc = ModBus_CRC16(response1, sizeof(response1) - 2);
+        response1[sizeof(response1) - 2] = crc & 0xFF; // CRC Low
+        response1[sizeof(response1) - 1] = (crc >> 8) & 0xFF; // CRC High
 
+        HAL_UART_Transmit(&huart3, &response1, sizeof(response1), 100);
+
+      }
+
+
+      #if 1
+      if (request[0] == 0x02)
+      {
+        AM1002_Data_t write_data = ProcessAndPrintAM1002(&huart3, rx_buffer);
+        multiDatawrite(write_data);
+        
+        uint8_t response[] = {0x02, 0x03, 0x0C, 
+          (uint8_t)(write_data.tvoc >> 8), (uint8_t)(write_data.tvoc & 0xFF), // TVOC 
+          (uint8_t)(write_data.pm1_0 >> 8), (uint8_t)(write_data.pm1_0 & 0xFF), // PM1.0
+          (uint8_t)(write_data.pm2_5 >> 8), (uint8_t)(write_data.pm2_5 & 0xFF), // PM2.5
+          (uint8_t)(write_data.pm10 >> 8), (uint8_t)(write_data.pm10 & 0xFF), // PM10
+          (uint8_t)(write_data.humidity >> 8), (uint8_t)(write_data.humidity & 0xFF), // Temperature
+          (uint8_t)(write_data.temperature >> 8), (uint8_t)(write_data.temperature & 0xFF), // Humidity
+          0xB4, 0x27};
+        uint16_t crc = ModBus_CRC16(response, sizeof(response) - 2);
+        response[sizeof(response) - 2] = crc & 0xFF; // CRC Low
+        response[sizeof(response) - 1] = (crc >> 8) & 0xFF; // CRC High
+
+        HAL_UART_Transmit(&huart3, &response, sizeof(response), 100);
+
+      }
+      #endif
+
+
+      if (status == HAL_OK && request[0] == 0x03)
+      {
+
+        // char debug[100];
+        // sprintf(debug, "Raw Data: ");
+        // HAL_UART_Transmit(&huart3, (uint8_t *)debug, strlen(debug), HAL_MAX_DELAY);
+
+        // memset(debug, 0, sizeof(debug));
+        // for (int i = 0; i < 22; i++)
+        // {
+        //   sprintf(debug, "%02X ", rx_buffer[i]);
+        //   HAL_UART_Transmit(&huart3, (uint8_t *)debug, strlen(debug), HAL_MAX_DELAY);
+        // }
+        // HAL_UART_Transmit(&huart3, (uint8_t *)"\r\n", 2, HAL_MAX_DELAY);
+       
+       
+       
+       
         if (rx_buffer[0] == 0x16 && rx_buffer[1] == 0x13 && rx_buffer[2] == 0x16)
         {
           AM1002_Data_t current_data = ProcessAndPrintAM1002(&huart3, rx_buffer);
@@ -212,19 +278,42 @@ int main(void)
           }
           else
           {
+            #ifdef terminal_mode
             HAL_UART_Transmit(&huart3, (uint8_t *)"Humidity is low\r\n", 18, HAL_MAX_DELAY);
+            #endif
+            uint8_t response[] = {0x03, 0x03, 0x0C, 
+              (uint8_t)(current_data.tvoc >> 8), (uint8_t)(current_data.tvoc & 0xFF), // TVOC 
+              (uint8_t)(current_data.pm1_0 >> 8), (uint8_t)(current_data.pm1_0 & 0xFF), // PM1.0
+              (uint8_t)(current_data.pm2_5 >> 8), (uint8_t)(current_data.pm2_5 & 0xFF), // PM2.5
+              (uint8_t)(current_data.pm10 >> 8), (uint8_t)(current_data.pm10 & 0xFF), // PM10
+              (uint8_t)(current_data.humidity >> 8), (uint8_t)(current_data.humidity & 0xFF), // Temperature
+              (uint8_t)(current_data.temperature >> 8), (uint8_t)(current_data.temperature & 0xFF), // Humidity
+              0xB4, 0x27};
+            uint16_t crc = ModBus_CRC16(response, sizeof(response) - 2);
+            response[sizeof(response) - 2] = crc & 0xFF; // CRC Low
+            response[sizeof(response) - 1] = (crc >> 8) & 0xFF; // CRC High
+
+            HAL_UART_Transmit(&huart3, &response, sizeof(response), 100);
           }
         }
         else
         {
+          #ifdef terminal_mode
           HAL_UART_Transmit(&huart3, (uint8_t *)"Error\r\n", 7, HAL_MAX_DELAY);
+          #endif
         }
       }
       else
       {
+        #ifdef terminal_mode
         HAL_UART_Transmit(&huart3, (uint8_t *)"Error\r\n", 7, HAL_MAX_DELAY);
+        #endif
       }
+      #endif
+
+
     }
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

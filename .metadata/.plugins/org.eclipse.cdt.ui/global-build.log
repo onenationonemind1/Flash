@@ -1,0 +1,73 @@
+14:40:44 **** Incremental Build of configuration Debug for project Flash ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F071xB -c -I../Core/Inc -I../Drivers/STM32F0xx_HAL_Driver/Inc -I../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:220:24: warning: implicit declaration of function 'ModBus_CRC16' [-Wimplicit-function-declaration]
+  220 |         uint16_t crc = ModBus_CRC16(response1, sizeof(response1) - 2);
+      |                        ^~~~~~~~~~~~
+../Core/Src/main.c:224:36: warning: passing argument 2 of 'HAL_UART_Transmit' from incompatible pointer type [-Wincompatible-pointer-types]
+  224 |         HAL_UART_Transmit(&huart3, &response1, sizeof(response1), 100);
+      |                                    ^~~~~~~~~~
+      |                                    |
+      |                                    uint8_t (*)[17] {aka unsigned char (*)[17]}
+In file included from ../Core/Inc/stm32f0xx_hal_conf.h:289,
+                 from ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h:29,
+                 from ../Core/Inc/main.h:31,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart.h:1568:79: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'uint8_t (*)[17]' {aka 'unsigned char (*)[17]'}
+ 1568 | HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);
+      |                                                                ~~~~~~~~~~~~~~~^~~~~
+../Core/Src/main.c:233:9: warning: implicit declaration of function 'multiDatawrite'; did you mean 'multiDataread'? [-Wimplicit-function-declaration]
+  233 |         multiDatawrite(write_data);
+      |         ^~~~~~~~~~~~~~
+      |         multiDataread
+../Core/Src/main.c:247:36: warning: passing argument 2 of 'HAL_UART_Transmit' from incompatible pointer type [-Wincompatible-pointer-types]
+  247 |         HAL_UART_Transmit(&huart3, &response, sizeof(response), 100);
+      |                                    ^~~~~~~~~
+      |                                    |
+      |                                    uint8_t (*)[17] {aka unsigned char (*)[17]}
+../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart.h:1568:79: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'uint8_t (*)[17]' {aka 'unsigned char (*)[17]'}
+ 1568 | HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);
+      |                                                                ~~~~~~~~~~~~~~~^~~~~
+../Core/Src/main.c:296:40: warning: passing argument 2 of 'HAL_UART_Transmit' from incompatible pointer type [-Wincompatible-pointer-types]
+  296 |             HAL_UART_Transmit(&huart3, &response, sizeof(response), 100);
+      |                                        ^~~~~~~~~
+      |                                        |
+      |                                        uint8_t (*)[17] {aka unsigned char (*)[17]}
+../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart.h:1568:79: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'uint8_t (*)[17]' {aka 'unsigned char (*)[17]'}
+ 1568 | HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);
+      |                                                                ~~~~~~~~~~~~~~~^~~~~
+../Core/Src/main.c:175:11: warning: unused variable 'data' [-Wunused-variable]
+  175 |   uint8_t data;
+      |           ^~~~
+../Core/Src/main.c:174:12: warning: unused variable 'arr_test' [-Wunused-variable]
+  174 |   uint8_t* arr_test = &test;
+      |            ^~~~~~~~
+../Core/Src/main.c:172:7: warning: unused variable 'count' [-Wunused-variable]
+  172 |   int count = 0;
+      |       ^~~~~
+../Core/Src/main.c:168:11: warning: unused variable 'rx_data' [-Wunused-variable]
+  168 |   uint8_t rx_data;
+      |           ^~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:104:8: warning: 'PrintAM1002Data' defined but not used [-Wunused-function]
+  104 |   void PrintAM1002Data(UART_HandleTypeDef * huart, AM1002_Data_t * data)
+      |        ^~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "Flash.elf" @"objects.list"   -mcpu=cortex-m0 -T"C:\Users\changhoon\STM32CubeIDE\Flash\Flash\STM32F071C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Flash.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Flash.elf
+ 
+arm-none-eabi-size  Flash.elf 
+arm-none-eabi-objdump -h -S Flash.elf  > "Flash.list"
+   text	   data	    bss	    dec	    hex	filename
+  17444	     12	   2088	  19544	   4c58	Flash.elf
+Finished building: default.size.stdout
+ 
+Finished building: Flash.list
+ 
+14:40:49 **** Incremental Build of configuration Debug for project Flash ****
+make -j8 all 
+arm-none-eabi-size  Flash.elf 
+   text	   data	    bss	    dec	    hex	filename
+  17444	     12	   2088	  19544	   4c58	Flash.elf
+Finished building: default.size.stdout
+ 
