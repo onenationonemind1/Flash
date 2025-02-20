@@ -60,8 +60,8 @@ all: main-build
 main-build: Flash.elf secondary-outputs
 
 # Tool invocations
-Flash.elf Flash.map: $(OBJS) $(USER_OBJS) C:\Users\changhoon\STM32CubeIDE\Flash\Flash\STM32F071C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Flash.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"C:\Users\changhoon\STM32CubeIDE\Flash\Flash\STM32F071C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Flash.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Flash.elf Flash.map: $(OBJS) $(USER_OBJS) C:\Users\admin\STM32CubeIDE\sdk\Flash\STM32F071C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Flash.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"C:\Users\admin\STM32CubeIDE\sdk\Flash\STM32F071C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Flash.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -23,8 +23,7 @@
 #define __MAIN_H
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -39,10 +38,13 @@ extern "C"
 #include "timer.h"
 #include "flash.h"
 #include "modbus.h"
+#include "sensor.h"
+#include "uart_handle.h"
 
   extern TIM_HandleTypeDef htim2;
   extern UART_HandleTypeDef huart2;
   extern UART_HandleTypeDef huart3;
+  extern UART_HandleTypeDef huart4;
   extern DMA_HandleTypeDef hdma_usart2_tx;
   extern DMA_HandleTypeDef hdma_usart2_rx;
 
@@ -56,43 +58,42 @@ extern "C"
     uint16_t humidity;   // Humidity (% * 10)
   } AM1002_Data_t;
 
-  /* USER CODE END Includes */
+/* USER CODE END Includes */
 
-  /* Exported types ------------------------------------------------------------*/
-  /* USER CODE BEGIN ET */
-  #if 0
-  #define terminal_mode 1
-  #endif
+/* Exported types ------------------------------------------------------------*/
+/* USER CODE BEGIN ET */
+#if 0
+#define terminal_mode 1
+#endif
 
-  #if 1
-  #define terminal_modbus 1
-  #endif
+#if 1
+#define terminal_modbus 1
+#endif
 
+/* USER CODE END ET */
 
-  /* USER CODE END ET */
+/* Exported constants --------------------------------------------------------*/
+/* USER CODE BEGIN EC */
 
-  /* Exported constants --------------------------------------------------------*/
-  /* USER CODE BEGIN EC */
+/* USER CODE END EC */
 
-  /* USER CODE END EC */
+/* Exported macro ------------------------------------------------------------*/
+/* USER CODE BEGIN EM */
 
-  /* Exported macro ------------------------------------------------------------*/
-  /* USER CODE BEGIN EM */
+/* USER CODE END EM */
 
-  /* USER CODE END EM */
+/* Exported functions prototypes ---------------------------------------------*/
+void Error_Handler(void);
 
-  /* Exported functions prototypes ---------------------------------------------*/
-  void Error_Handler(void);
+/* USER CODE BEGIN EFP */
 
-  /* USER CODE BEGIN EFP */
+/* USER CODE END EFP */
 
-  /* USER CODE END EFP */
+/* Private defines -----------------------------------------------------------*/
 
-  /* Private defines -----------------------------------------------------------*/
+/* USER CODE BEGIN Private defines */
 
-  /* USER CODE BEGIN Private defines */
-
-  /* USER CODE END Private defines */
+/* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }

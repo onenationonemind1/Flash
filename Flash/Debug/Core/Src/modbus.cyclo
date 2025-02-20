@@ -1,1 +1,2 @@
-../Core/Src/modbus.c:3:10:ModBus_CRC16	4
+../Core/Src/modbus.c:8:10:ModBus_CRC16	4
+../Core/Src/modbus.c:32:6:modbus_receive	1

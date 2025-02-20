@@ -44,8 +44,6 @@ TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
-DMA_HandleTypeDef hdma_usart2_tx;
-DMA_HandleTypeDef hdma_usart2_rx;
 
 /* USER CODE BEGIN PV */
 
@@ -54,7 +52,6 @@ DMA_HandleTypeDef hdma_usart2_rx;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_USART3_UART_Init(void);
@@ -80,6 +77,7 @@ AM1002_Data_t multiDataread(void);
  */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
   AM1002_Data_t ProcessAM1002Data(uint8_t *data, AM1002_Data_t *result)
   {
@@ -132,9 +130,9 @@ int main(void)
   {
     AM1002_Data_t sensorData;
     AM1002_Data_t result = ProcessAM1002Data(rx_buffer, &sensorData);
-    #ifdef terminal_mode
+#ifdef terminal_mode
     PrintAM1002Data(huart, &sensorData);
-    #endif
+#endif
 
     return result;
   }
@@ -158,7 +156,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_TIM2_Init();
   MX_USART3_UART_Init();
@@ -171,7 +168,7 @@ int main(void)
 
   int count = 0;
   uint8_t test = 0x00;
-  uint8_t* arr_test = &test;
+  uint8_t *arr_test = &test;
   uint8_t data;
 
   uint8_t request[] = {0x01, 0x03, 0x00, 0x00, 0x00, 0x06, 0xC5, 0xCD};
@@ -182,73 +179,68 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
     if (g_timer_ms_1000 == ENABLE)
     {
       g_timer_ms_1000 = DISABLE;
 
-      test++;
-      #if 1
+      handle_am1002();
+
+#if 0
       // AM1002_Data_t read_data = multiDataread(); // 임시 변수 사용
       memset(rx_buffer, 0, sizeof(rx_buffer));
-      
-      #ifdef terminal_mode
-      PrintCalibrationData(read_data);
-      HAL_UART_Transmit(&huart3, (uint8_t *)"Data read done\r\n", 16, HAL_MAX_DELAY);
-      #endif
+
+      // PrintCalibrationData(read_data);
+      // HAL_UART_Transmit(&huart3, (uint8_t *)"Data read done\r\n", 16, HAL_MAX_DELAY);
 
       HAL_UART_Transmit(&huart2, cmd, sizeof(cmd), 1000);
-      HAL_StatusTypeDef status = HAL_UART_Receive(&huart2, rx_buffer, 22, 1000); 
+      HAL_StatusTypeDef status = HAL_UART_Receive(&huart2, rx_buffer, 22, 1000);
 
-      HAL_UART_Receive(&huart3, request, sizeof(request), 1000); 
-      //HAL_UART_Transmit(&huart3, request, sizeof(request), 100);
+      HAL_UART_Receive(&huart3, request, sizeof(request), 1000);
+      // HAL_UART_Transmit(&huart3, request, sizeof(request), 100);
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-
-    
 
       if (request[0] == 0x01)
       {
         AM1002_Data_t read_data = multiDataread();
 
-        uint8_t response1[] = {0x01, 0x03, 0x0C, 
-          (uint8_t)(read_data.tvoc >> 8), (uint8_t)(read_data.tvoc & 0xFF), // TVOC 
-          (uint8_t)(read_data.pm1_0 >> 8), (uint8_t)(read_data.pm1_0 & 0xFF), // PM1.0
-          (uint8_t)(read_data.pm2_5 >> 8), (uint8_t)(read_data.pm2_5 & 0xFF), // PM2.5
-          (uint8_t)(read_data.pm10 >> 8), (uint8_t)(read_data.pm10 & 0xFF), // PM10
-          (uint8_t)(read_data.humidity >> 8), (uint8_t)(read_data.humidity & 0xFF), // Temperature
-          (uint8_t)(read_data.temperature >> 8), (uint8_t)(read_data.temperature & 0xFF), // Humidity
-          0x00, 0x00};
+        uint8_t response1[] = {0x01, 0x03, 0x0C,
+                               (uint8_t)(read_data.tvoc >> 8), (uint8_t)(read_data.tvoc & 0xFF),               // TVOC
+                               (uint8_t)(read_data.pm1_0 >> 8), (uint8_t)(read_data.pm1_0 & 0xFF),             // PM1.0
+                               (uint8_t)(read_data.pm2_5 >> 8), (uint8_t)(read_data.pm2_5 & 0xFF),             // PM2.5
+                               (uint8_t)(read_data.pm10 >> 8), (uint8_t)(read_data.pm10 & 0xFF),               // PM10
+                               (uint8_t)(read_data.humidity >> 8), (uint8_t)(read_data.humidity & 0xFF),       // Temperature
+                               (uint8_t)(read_data.temperature >> 8), (uint8_t)(read_data.temperature & 0xFF), // Humidity
+                               0x00, 0x00};
         uint16_t crc = ModBus_CRC16(response1, sizeof(response1) - 2);
-        response1[sizeof(response1) - 2] = crc & 0xFF; // CRC Low
+        response1[sizeof(response1) - 2] = crc & 0xFF;        // CRC Low
         response1[sizeof(response1) - 1] = (crc >> 8) & 0xFF; // CRC High
 
         HAL_UART_Transmit(&huart3, &response1, sizeof(response1), 100);
-
       }
 
-
-      #if 1
+#if 1
       if (request[0] == 0x02)
       {
         AM1002_Data_t write_data = ProcessAndPrintAM1002(&huart3, rx_buffer);
         multiDatawrite(write_data);
-        
-        uint8_t response[] = {0x02, 0x03, 0x0C, 
-          (uint8_t)(write_data.tvoc >> 8), (uint8_t)(write_data.tvoc & 0xFF), // TVOC 
-          (uint8_t)(write_data.pm1_0 >> 8), (uint8_t)(write_data.pm1_0 & 0xFF), // PM1.0
-          (uint8_t)(write_data.pm2_5 >> 8), (uint8_t)(write_data.pm2_5 & 0xFF), // PM2.5
-          (uint8_t)(write_data.pm10 >> 8), (uint8_t)(write_data.pm10 & 0xFF), // PM10
-          (uint8_t)(write_data.humidity >> 8), (uint8_t)(write_data.humidity & 0xFF), // Temperature
-          (uint8_t)(write_data.temperature >> 8), (uint8_t)(write_data.temperature & 0xFF), // Humidity
-          0xB4, 0x27};
+
+        uint8_t response[] = {0x02, 0x03, 0x0C,
+                              (uint8_t)(write_data.tvoc >> 8), (uint8_t)(write_data.tvoc & 0xFF),               // TVOC
+                              (uint8_t)(write_data.pm1_0 >> 8), (uint8_t)(write_data.pm1_0 & 0xFF),             // PM1.0
+                              (uint8_t)(write_data.pm2_5 >> 8), (uint8_t)(write_data.pm2_5 & 0xFF),             // PM2.5
+                              (uint8_t)(write_data.pm10 >> 8), (uint8_t)(write_data.pm10 & 0xFF),               // PM10
+                              (uint8_t)(write_data.humidity >> 8), (uint8_t)(write_data.humidity & 0xFF),       // Temperature
+                              (uint8_t)(write_data.temperature >> 8), (uint8_t)(write_data.temperature & 0xFF), // Humidity
+                              0xB4, 0x27};
         uint16_t crc = ModBus_CRC16(response, sizeof(response) - 2);
-        response[sizeof(response) - 2] = crc & 0xFF; // CRC Low
+        response[sizeof(response) - 2] = crc & 0xFF;        // CRC Low
         response[sizeof(response) - 1] = (crc >> 8) & 0xFF; // CRC High
 
         HAL_UART_Transmit(&huart3, &response, sizeof(response), 100);
-
       }
-      #endif
-
+#endif
 
       if (status == HAL_OK && request[0] == 0x03)
       {
@@ -264,57 +256,44 @@ int main(void)
         //   HAL_UART_Transmit(&huart3, (uint8_t *)debug, strlen(debug), HAL_MAX_DELAY);
         // }
         // HAL_UART_Transmit(&huart3, (uint8_t *)"\r\n", 2, HAL_MAX_DELAY);
-       
-       
-       
-       
-        if (rx_buffer[0] == 0x16 && rx_buffer[1] == 0x13 && rx_buffer[2] == 0x16)
+
+        if (1)
         {
           AM1002_Data_t current_data = ProcessAndPrintAM1002(&huart3, rx_buffer);
-          if (current_data.humidity > 500)
-          {
-            multiDatawrite(current_data);
-            // PrintCalibrationData(read_data1);
-          }
-          else
-          {
-            #ifdef terminal_mode
-            HAL_UART_Transmit(&huart3, (uint8_t *)"Humidity is low\r\n", 18, HAL_MAX_DELAY);
-            #endif
-            uint8_t response[] = {0x03, 0x03, 0x0C, 
-              (uint8_t)(current_data.tvoc >> 8), (uint8_t)(current_data.tvoc & 0xFF), // TVOC 
-              (uint8_t)(current_data.pm1_0 >> 8), (uint8_t)(current_data.pm1_0 & 0xFF), // PM1.0
-              (uint8_t)(current_data.pm2_5 >> 8), (uint8_t)(current_data.pm2_5 & 0xFF), // PM2.5
-              (uint8_t)(current_data.pm10 >> 8), (uint8_t)(current_data.pm10 & 0xFF), // PM10
-              (uint8_t)(current_data.humidity >> 8), (uint8_t)(current_data.humidity & 0xFF), // Temperature
-              (uint8_t)(current_data.temperature >> 8), (uint8_t)(current_data.temperature & 0xFF), // Humidity
-              0xB4, 0x27};
-            uint16_t crc = ModBus_CRC16(response, sizeof(response) - 2);
-            response[sizeof(response) - 2] = crc & 0xFF; // CRC Low
-            response[sizeof(response) - 1] = (crc >> 8) & 0xFF; // CRC High
 
-            HAL_UART_Transmit(&huart3, &response, sizeof(response), 100);
-          }
+#ifdef terminal_mode
+          HAL_UART_Transmit(&huart3, (uint8_t *)"Humidity is low\r\n", 18, HAL_MAX_DELAY);
+#endif
+          uint8_t response[] = {0x03, 0x03, 0x0C,
+                                (uint8_t)(current_data.tvoc >> 8), (uint8_t)(current_data.tvoc & 0xFF),               // TVOC
+                                (uint8_t)(current_data.pm1_0 >> 8), (uint8_t)(current_data.pm1_0 & 0xFF),             // PM1.0
+                                (uint8_t)(current_data.pm2_5 >> 8), (uint8_t)(current_data.pm2_5 & 0xFF),             // PM2.5
+                                (uint8_t)(current_data.pm10 >> 8), (uint8_t)(current_data.pm10 & 0xFF),               // PM10
+                                (uint8_t)(current_data.humidity >> 8), (uint8_t)(current_data.humidity & 0xFF),       // Temperature
+                                (uint8_t)(current_data.temperature >> 8), (uint8_t)(current_data.temperature & 0xFF), // Humidity
+                                0xB4, 0x27};
+          uint16_t crc = ModBus_CRC16(response, sizeof(response) - 2);
+          response[sizeof(response) - 2] = crc & 0xFF;        // CRC Low
+          response[sizeof(response) - 1] = (crc >> 8) & 0xFF; // CRC High
+
+          HAL_UART_Transmit(&huart3, &response, sizeof(response), 100);
+          // HAL_UART_Transmit(&huart4, &response, sizeof(response), 100);
         }
         else
         {
-          #ifdef terminal_mode
+#ifdef terminal_mode
           HAL_UART_Transmit(&huart3, (uint8_t *)"Error\r\n", 7, HAL_MAX_DELAY);
-          #endif
+#endif
         }
       }
       else
       {
-        #ifdef terminal_mode
+#ifdef terminal_mode
         HAL_UART_Transmit(&huart3, (uint8_t *)"Error\r\n", 7, HAL_MAX_DELAY);
-        #endif
+#endif
       }
-      #endif
-
-
+#endif
     }
-
-    /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
@@ -471,21 +450,6 @@ static void MX_USART3_UART_Init(void)
   /* USER CODE BEGIN USART3_Init 2 */
 
   /* USER CODE END USART3_Init 2 */
-}
-
-/**
- * Enable DMA controller clock
- */
-static void MX_DMA_Init(void)
-{
-
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA1_CLK_ENABLE();
-
-  /* DMA interrupt init */
-  /* DMA1_Channel4_5_6_7_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel4_5_6_7_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel4_5_6_7_IRQn);
 }
 
 /**

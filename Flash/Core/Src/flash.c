@@ -41,7 +41,7 @@ void multiDatawrite(AM1002_Data_t data)
 {
     uint16_t multiData[6] = {data.tvoc, data.pm1_0, data.pm2_5, data.pm10, (uint16_t)data.temperature, data.humidity};
     WriteMultiDataToFlash(multiData, 6);
-    #ifdef terminal_mode
+#ifdef terminal_mode
     if (WriteMultiDataToFlash(multiData, 6) == HAL_OK)
     {
         HAL_UART_Transmit(&huart3, (uint8_t *)"Data write!!\r\n", 20, HAL_MAX_DELAY);
@@ -53,13 +53,12 @@ void multiDatawrite(AM1002_Data_t data)
             sprintf(debug_msg, "Read[%d]: 0x%02X\r\n", i, readData);
             HAL_UART_Transmit(&huart3, (uint8_t *)debug_msg, strlen(debug_msg), HAL_MAX_DELAY);
         }
-        
     }
     else
     {
         HAL_UART_Transmit(&huart3, (uint8_t *)"Data write fail!!\r\n", 20, HAL_MAX_DELAY);
     }
-    #endif
+#endif
 }
 
 AM1002_Data_t multiDataread(void)
@@ -70,12 +69,12 @@ AM1002_Data_t multiDataread(void)
     for (int i = 0; i < 6; i++)
     {
         readData[i] = ReadDataFromFlashAt(i);
-        #if 0 // terminal_mode가 정의되어 있으면
+#if 0 // terminal_mode가 정의되어 있으면
         HAL_UART_Transmit(&huart3, (uint8_t *)"Read Data: ", 11, HAL_MAX_DELAY);
         char debug_msg[50];
         sprintf(debug_msg, "[%d] 0x%04X ", i, readData[i]); // 수정된 부분
         HAL_UART_Transmit(&huart3, (uint8_t *)debug_msg, strlen(debug_msg), HAL_MAX_DELAY);
-        #endif
+#endif
     }
     // HAL_UART_Transmit(&huart3, (uint8_t *)"\r\n", 2, HAL_MAX_DELAY);
 
