@@ -1,2 +1,0 @@
-../Core/Src/modbus.c:8:10:ModBus_CRC16	24	static
-../Core/Src/modbus.c:32:6:modbus_receive	8	static

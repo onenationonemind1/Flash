@@ -1,8 +1,15 @@
 #include "main.h"
 #include <stdint.h>
 
-uint8_t modbus_rx_buffer[256];
-uint8_t g_modbus_state = MODBUS_SOM;
+#define MODBUS_READ_COILS 1
+#define MODBUS_READ_DISCRETE_INPUT 2
+#define MODBUS_READ_HOLDING_REGISTERS 3
+#define MODBUS_READ_INPUT_REGISTERS 4
+
+#define MODBUS_WRITE_SINGLE_COIL 5
+#define MODBUS_WRITE_SINGLE_REGISTER 6
+#define MODBUS_WRITE_MULTIPLE_COILS 15
+#define MODBUS_WRITE_MULTIPLE_REGISTERS 16
 
 enum
 {
@@ -14,6 +21,16 @@ enum
     MODBUS_DATA,                 /* 05 */
     MODBUS_CRC,                  /* 06 */
 };
+
+enum
+{
+    MODBUS_READ = 0, /* 00 */
+    MODBUS_WRITE,    /* 00 */
+    MODBUS_NONE,     /* 00 */
+};
+
+uint8_t modbus_rx_buffer[256];
+uint8_t g_modbus_state = MODBUS_SOM;
 
 uint16_t ModBus_CRC16(uint8_t *data, uint16_t length);
 void modbus_receive();
