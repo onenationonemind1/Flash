@@ -37,6 +37,10 @@ uint8_t rx_data;
 uint8_t cmd[] = {0x11, 0x01, 0x16, 0xD8};
 static uint8_t rx_buffer_1[22];
 
+uint8_t parser_buffer[50] = {
+    0,
+};
+
 uint8_t g_am1002_data[32];
 
 uint8_t request[] = {0x01, 0x03, 0x00, 0x00, 0x00, 0x06, 0xC5, 0xCD};
@@ -51,6 +55,13 @@ void handle_am1002(void)
         am1002_receive(AM1002_READ_MEASUREMENT_RESULT, rx_buffer_1, &g_sensor_current);
     }
     send_sensor_data(&g_sensor_current);
+
+    HAL_UART_Receive(&huart3, parser_buffer, 50, 1000);
+    for (int i = 0; i < 50; i++)
+    {
+        parser(parser_buffer[i]);
+        parser_modbus(parser_buffer[i]);
+        }
 }
 
 uint8_t am1002_checksum(uint8_t *pdata, uint8_t length)

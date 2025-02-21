@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "main.h": "c",
-        "timer.h": "c"
+        "timer.h": "c",
+        "array": "c",
+        "string": "c"
     }
 }

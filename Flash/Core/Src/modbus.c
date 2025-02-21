@@ -70,7 +70,38 @@ void parser_modbus(uint8_t data)
 {
     switch (g_modbus_state)
     {
-        case
+    case MODBUS_SOM:
+    {
+        // if ((data == g_modbus_slave_address) || (data == 0))
+        if (data == g_modbus_slave_address)
+        {
+            g_packet_modbus_rx.slave_id = data;
+
+            index = 0;
+            g_modbus_state = MODBUS_FUNCTION_CODE;
+        }
+        else
+        {
+            //                printf("addr\n");
+        }
+    }
+    break;
+
+    case MODBUS_FUNCTION_CODE:
+    {
+        if (parser_modbus_function_code(data) < MODBUS_NONE)
+        {
+            g_packet_modbus_rx.function_code = data;
+
+            index = 0;
+            g_modbus_state = MODBUS_ADDRESS;
+        }
+        else
+        {
+            g_modbus_state = MODBUS_SOM;
+        }
+    }
+    break;
     }
 }
 
@@ -82,23 +113,23 @@ uint8_t parser_modbus_function_code(uint8_t function_code)
     {
 
     case MODBUS_READ_COILS:             // 4 [01, 0x01] Read Coil
-        case MODBUS_READ_DISCRETE_INPUT:    // 4 [02, 0x02] Read Discrete Input
-        case MODBUS_READ_HOLDING_REGISTERS: // 4 [03, 0x03] Read Holding Registers
-        case MODBUS_READ_INPUT_REGISTERS:   // 4 [04, 0x04] Read Input Registers
-        {
-            result = MODBUS_READ;
-        }
-        break;
+    case MODBUS_READ_DISCRETE_INPUT:    // 4 [02, 0x02] Read Discrete Input
+    case MODBUS_READ_HOLDING_REGISTERS: // 4 [03, 0x03] Read Holding Registers
+    case MODBUS_READ_INPUT_REGISTERS:   // 4 [04, 0x04] Read Input Registers
+    {
+        result = MODBUS_READ;
+    }
+    break;
 
-        case MODBUS_WRITE_SINGLE_COIL:        // 4 [05, 0x05] Write Single Coil
-        case MODBUS_WRITE_SINGLE_REGISTER:    // 4 [06, 0x06] Write Single Holding Register
-        case MODBUS_WRITE_MULTIPLE_COILS:     // 4 [15, 0x0F] Write Multiple Coils
-        case MODBUS_WRITE_MULTIPLE_REGISTERS: // 4 [16, 0x10] Write Multiple Holding Registers
-        {
-            result = MODBUS_WRITE;
-        }
-        break;
-        }
+    case MODBUS_WRITE_SINGLE_COIL:        // 4 [05, 0x05] Write Single Coil
+    case MODBUS_WRITE_SINGLE_REGISTER:    // 4 [06, 0x06] Write Single Holding Register
+    case MODBUS_WRITE_MULTIPLE_COILS:     // 4 [15, 0x0F] Write Multiple Coils
+    case MODBUS_WRITE_MULTIPLE_REGISTERS: // 4 [16, 0x10] Write Multiple Holding Registers
+    {
+        result = MODBUS_WRITE;
+    }
+    break;
+    }
 
-        return result;
+    return result;
 }

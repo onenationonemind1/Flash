@@ -23,7 +23,8 @@
 #define __MAIN_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -40,13 +41,88 @@ extern "C" {
 #include "modbus.h"
 #include "sensor.h"
 #include "uart_handle.h"
+#include "parser.h"
+#include "function.h"
 
-  extern TIM_HandleTypeDef htim2;
-  extern UART_HandleTypeDef huart2;
-  extern UART_HandleTypeDef huart3;
-  extern UART_HandleTypeDef huart4;
-  extern DMA_HandleTypeDef hdma_usart2_tx;
-  extern DMA_HandleTypeDef hdma_usart2_rx;
+#define __USE_MODBUS_PARSER_ 1
+#define __USE_MODE_RS232_ 1
+#define __USE_MODE_RS485_ 0
+
+#define INIT_DATA_1 0x2
+#define INIT_DATA_2 0x3
+
+#define VERSION_MAJOR 1
+#define VERSION_MINOR 0
+#define VERSION_REVISION 2
+
+#define RS485_ID 1
+#define RS485_FUNCTION_CODE 3
+
+#define PERIOD_SEC_01 1
+#define PERIOD_SEC_02 2
+#define PERIOD_SEC_05 5
+#define PERIOD_SEC_10 10
+#define PERIOD_MIN_01 60
+#define PERIOD_MIN_02 120
+#define PERIOD_MIN_05 300
+#define PERIOD_MIN_60 3600
+
+#if 1
+#define TIME_CETIFICATION_MIN_01 (60 * 1)
+#define TIME_CETIFICATION_MIN_05 (60 * 5)
+#define TIME_CETIFICATION_MIN_60 (60 * 60)
+#else
+#define TIME_CETIFICATION_MIN_01 (1)
+#define TIME_CETIFICATION_MIN_05 (5)
+#define TIME_CETIFICATION_MIN_60 (60)
+#endif
+
+// Key
+#define PORT_KEY_POWER GPIOB
+#define PORT_KEY_UP GPIOB
+#define PORT_KEY_DOWN GPIOB
+
+#define PIN_KEY_POWER GPIO_PIN_9
+#define PIN_KEY_UP GPIO_PIN_4
+#define PIN_KEY_DOWN GPIO_PIN_5
+
+// Led
+#define PORT_LED_RED GPIOC
+#define PORT_LED_GREEN GPIOC
+#define PORT_LED_BLUE GPIOC
+
+#define PIN_LED_RED GPIO_PIN_13
+#define PIN_LED_GREEN GPIO_PIN_14
+#define PIN_LED_BLUE GPIO_PIN_15
+
+// Switch
+#define PORT_MODE_0 GPIOB
+#define PORT_MODE_1 GPIOB
+#define PORT_MODE_2 GPIOB
+#define PORT_MODE_3 GPIOB
+
+#define PIN_MODE_0 GPIO_PIN_0
+#define PIN_MODE_1 GPIO_PIN_1
+#define PIN_MODE_2 GPIO_PIN_2
+#define PIN_MODE_3 GPIO_PIN_3
+
+// RS485
+#define PORT_RS485_ENABLE GPIOA
+#define PIN_RS485_ENABLE GPIO_PIN_15
+
+#if 1
+#define uprintf printf
+#define printf_mb printf
+#else
+#define uprintf(fmt, ...)
+#define printf_mb
+#endif
+
+  TIM_HandleTypeDef htim2;
+
+  UART_HandleTypeDef huart1;
+  UART_HandleTypeDef huart2;
+  UART_HandleTypeDef huart3;
 
   typedef struct
   {
@@ -58,10 +134,10 @@ extern "C" {
     uint16_t humidity;   // Humidity (% * 10)
   } AM1002_Data_t;
 
-/* USER CODE END Includes */
+  /* USER CODE END Includes */
 
-/* Exported types ------------------------------------------------------------*/
-/* USER CODE BEGIN ET */
+  /* Exported types ------------------------------------------------------------*/
+  /* USER CODE BEGIN ET */
 #if 0
 #define terminal_mode 1
 #endif
@@ -70,30 +146,30 @@ extern "C" {
 #define terminal_modbus 1
 #endif
 
-/* USER CODE END ET */
+  /* USER CODE END ET */
 
-/* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
+  /* Exported constants --------------------------------------------------------*/
+  /* USER CODE BEGIN EC */
 
-/* USER CODE END EC */
+  /* USER CODE END EC */
 
-/* Exported macro ------------------------------------------------------------*/
-/* USER CODE BEGIN EM */
+  /* Exported macro ------------------------------------------------------------*/
+  /* USER CODE BEGIN EM */
 
-/* USER CODE END EM */
+  /* USER CODE END EM */
 
-/* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
+  /* Exported functions prototypes ---------------------------------------------*/
+  void Error_Handler(void);
 
-/* USER CODE BEGIN EFP */
+  /* USER CODE BEGIN EFP */
 
-/* USER CODE END EFP */
+  /* USER CODE END EFP */
 
-/* Private defines -----------------------------------------------------------*/
+  /* Private defines -----------------------------------------------------------*/
 
-/* USER CODE BEGIN Private defines */
+  /* USER CODE BEGIN Private defines */
 
-/* USER CODE END Private defines */
+  /* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }

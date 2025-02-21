@@ -29,7 +29,8 @@ Core/Src/timer.o: ../Core/Src/timer.c ../Core/Inc/main.h \
  ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart.h \
  ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart_ex.h \
  ../Core/Inc/timer.h ../Core/Inc/flash.h ../Core/Inc/modbus.h \
- ../Core/Inc/sensor.h ../Core/Inc/main.h ../Core/Inc/uart_handle.h
+ ../Core/Inc/sensor.h ../Core/Inc/main.h ../Core/Inc/uart_handle.h \
+ ../Core/Inc/parser.h ../Core/Inc/function.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h:
 ../Core/Inc/stm32f0xx_hal_conf.h:
@@ -66,3 +67,5 @@ Core/Src/timer.o: ../Core/Src/timer.c ../Core/Inc/main.h \
 ../Core/Inc/sensor.h:
 ../Core/Inc/main.h:
 ../Core/Inc/uart_handle.h:
+../Core/Inc/parser.h:
+../Core/Inc/function.h:
